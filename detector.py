@@ -23,8 +23,8 @@ if __name__ == "__main__" :
     parser.add_argument('-t1', '--lower-threshold', type=int, default=400)
     parser.add_argument('-t2', '--upper-threshold', type=int, default=600)
     parser.add_argument('-fn', '--filename', type=str)
-    parser.add_argument('--dirname', type=str, default='data/')
-    parser.add_argument('--out-dir', type=str, default='out/')
+    parser.add_argument('--dirname', type=str, default='data')
+    parser.add_argument('--out-dir', type=str, default='out')
     parser.add_argument('--display', action='store_true')
     args = parser.parse_args() 
     # Verbose setting 
@@ -39,7 +39,7 @@ if __name__ == "__main__" :
     for files in os.listdir(args.dirname) : 
         if files.endswith('.JPG') : 
             if not args.filename :
-                filename = args.dirname + files 
+                filename = args.dirname + '/' + files 
             # Reading image
             img = cv.imread(filename)
             logging.info(f'File          : {filename}')
@@ -86,7 +86,7 @@ if __name__ == "__main__" :
             # Save images 
             if not os.path.isdir(args.out_dir) : 
                 os.mkdir(args.out_dir)
-            cv.imwrite(args.out_dir + filename.replace('.JPG', '.png'), out)
+            cv.imwrite(args.out_dir + '/' + files.replace('.JPG', '.png'), out)
             # Display image
             if args.display :
                 displayImg(img, edges, ccl, out)

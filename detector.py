@@ -12,20 +12,20 @@ from datetime import datetime
 if __name__ == "__main__" : 
     # Initializing parser 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-n', '--sample-size', type=int, default=5) 
-    parser.add_argument('-k', '--iteration',   type=int, default=50) 
-    parser.add_argument('-t', '--threshold',   type=float, default=0.1) 
-    parser.add_argument('-d', '--tolerance',   type=int, default=90) 
-    parser.add_argument('-w', '--width',       type=int, default=640)
-    parser.add_argument('-hi', '--height',     type=int, default=320)
-    parser.add_argument('-a', '--blob-area',   type=int, default=100)
-    parser.add_argument('-v', '--verbose',     action='store_true')
-    parser.add_argument('-t1', '--lower-threshold', type=int, default=400)
-    parser.add_argument('-t2', '--upper-threshold', type=int, default=600)
-    parser.add_argument('-fn', '--filename', type=str)
-    parser.add_argument('--dirname', type=str, default='data')
-    parser.add_argument('--out-dir', type=str, default='out')
-    parser.add_argument('--display', action='store_true')
+    parser.add_argument('-n', '--sample-size', type=int, default=5, help="the smallest number of points required in RANSAC. (default=5)") 
+    parser.add_argument('-k', '--iteration',   type=int, default=50, help="the number of iterations required. (default=50)") 
+    parser.add_argument('-t', '--threshold',   type=float, default=0.1, help="the threshold used to identify a point that fits well. (default=0.1)") 
+    parser.add_argument('-d', '--tolerance',   type=int, default=90, help="the number of nearby points required to assert a model fits well. (default=90)") 
+    parser.add_argument('-w', '--width',       type=int, default=640, help="the width of the input image resizing into. (default=640)")
+    parser.add_argument('-hi', '--height',     type=int, default=320, help="the height of the input image resizing into. (default=320)")
+    parser.add_argument('-a', '--blob-area',   type=int, default=100, help="any connected components with less area than the input area is removed. (default=100)")
+    parser.add_argument('-v', '--verbose',     action='store_true', help="set this flag to log a verbose file")
+    parser.add_argument('-t1', '--lower-threshold', type=int, default=400, help="the lower threshold for Canny edge detector. (default=400)")
+    parser.add_argument('-t2', '--upper-threshold', type=int, default=600, help="the upper threshold for Canny edge detector. (default=400)")
+    parser.add_argument('--filename', type=str, help="to let the program process a single file.")
+    parser.add_argument('--dirname', type=str, default='data', help="the directory name of the input images, counterslash is not required. (default='data')")
+    parser.add_argument('--out-dir', type=str, default='out', help="the directory name of the output images, counterslash is not required. (default='out')")
+    parser.add_argument('--display', action='store_true', help="set this flag to display the images.")
     args = parser.parse_args() 
     # Verbose setting 
     if args.verbose: 
@@ -34,8 +34,10 @@ if __name__ == "__main__" :
     else : 
         logging.basicConfig(level=logging.INFO)
     ################## PREPROCESSING ###################
+    # Single file processing
     if args.filename :
         filename = args.filename
+    # Batch processing
     for files in os.listdir(args.dirname) : 
         if files.endswith('.JPG') : 
             if not args.filename :

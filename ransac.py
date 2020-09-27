@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 
 from itertools import combinations
 from utils import getDistance
@@ -16,45 +17,40 @@ def RANSAC(model, data, sampleSize, iterations, threshold, tolerance)  :
 
     # Until k iterations have occurred
     while iteration < iterations : 
-        print(f"Iteration : {iteration}")
+        logging.debug(f"Iteration : {iteration}")
         # Draw a sample of n points from the data uniformly and at random 
-        print("Choosing samples...")
         sampleIndexes, testIndexes = randomPartition(sampleSize, data.shape[0])
         sampleInliers = data[sampleIndexes]
         # Check collinearity  
         while checkCollinearity(sampleInliers) : 
-            print("Samples are collinear")
-            print("Rechoosing samples...")
             sampleIndexes, testIndexes = randomPartition(sampleSize, data.shape[0])
             sampleInliers = data[sampleIndexes]
-        print(f"Samples : \n{sampleInliers}\n")
+        logging.debug(f"Samples : \n{sampleInliers}\n")
         # Fit an ellipse 
         params = model.fit(sampleInliers)
-        print("Params : ")
-        print(f"  A    : {params[0]} \n  B    : {params[1]} \n  C    : {params[2]} \n  D    : {params[3]} \n  E    : {params[4]} \n  F    : [1] \n")        
+        logging.debug(f"  A    : {params[0]} \n  B    : {params[1]} \n  C    : {params[2]} \n  D    : {params[3]} \n  E    : {params[4]} \n  F    : [1] \n")        
         # Check if its an ellipse 
         if model.validateModel(params) :
-            print("Ellipse : True")
             # Computing the characterisitcs of the ellipse 
             tempModel = model.computeModel(params)
             # Discard the pixels that has greater distance than the threshold 
             filteredIndexes = filterIndexes(data, testIndexes, threshold, tempModel)
             filteredInliers = data[filteredIndexes]
             inliersRatio = len(filteredInliers) / len(data) * 100
-            # If there are 
-            # more points that the tolerance then it is a good fit
+            # If there are more points that the tolerance then it is a good fit
             if inliersRatio > tolerance : 
-                print("Inliers more than tolerance")
                 allInliers = np.concatenate((filteredInliers, sampleInliers))
                 error      = model.computeFittingError(allInliers, tempModel)
                 if error < bestError : 
                     bestModel = tempModel
-            else : print("Inliers less than tolerance")
-        else : 
-            print("Ellipse : False")
+
+                logging.debug("************************************************************\n")
+                logging.debug(f"x0      : {tempModel[0]} \ny0      : {tempModel[1]} \na       : {tempModel[2]} \nb       : {tempModel[3]} \ntheta   : {tempModel[4]}\n")        
+                logging.debug(f"Inliers : {len(filteredInliers)}\n")
+                logging.debug(f"Errors  : {error}\n")
 
         iteration = iteration + 1
-        print("================================================================")                    
+        logging.debug("================================================================")                    
         
     return bestModel
 
@@ -97,7 +93,6 @@ def filterIndexes(data, indexes, threshold, model) :
 
     for index in indexes : 
         temp = data[index]
-        # dist = getDistance(temp, params[0][0], params[1][0], params[2][0], x0, y0)
         dist = getDistance(temp, model[0], model[1], model[2], model[3], model[4])
         if (dist < threshold) : 
             filteredIndexes.append(index)

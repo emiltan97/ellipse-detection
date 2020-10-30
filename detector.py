@@ -26,6 +26,7 @@ if __name__ == "__main__" :
     parser.add_argument('--dirname', type=str, default='data', help="the directory name of the input images, counterslash is not required. (default='data')")
     parser.add_argument('--out-dir', type=str, default='out', help="the directory name of the output images, counterslash is not required. (default='out')")
     parser.add_argument('--display', action='store_true', help="set this flag to display the images.")
+    parser.add_argument('--crop', action='store_true', help="set this flag to output the cropped images on the elliptical region instead of highlighting the ellipse in the images.")
     args = parser.parse_args() 
     # Verbose setting 
     if args.verbose: 
@@ -45,13 +46,21 @@ if __name__ == "__main__" :
             # Reading image
             img = cv.imread(filename)
             logging.info(f'File          : {filename}')
+            # Save the width and the height of the original image
+            w   = img.shape[1]
+            h   = img.shape[0]
+            logging.info(f'Width : , {w}')
+            logging.info(f'Height : , {h}')
             # Downscaling image 
             img = cv.resize(img, (args.width, args.height))
             logging.info(f'Size (w, h)   : {args.width}, {args.height} ')
-            # Create a copy of input as an output
-            out = img.copy()
+            # If crop flag is set, create a mask of the detected elliptical region, else highlight the ellipses 
+            if args.crop : 
+                out = np.zeros((img.shape[0], img.shape[1], img.shape[2]), np.uint8)
+            else : 
+                out = img.copy()
             # Converting into edge map using Canny edge detection 
-            edges = cv.Canny(out, args.lower_threshold, args.upper_threshold)
+            edges = cv.Canny(img, args.lower_threshold, args.upper_threshold)
             logging.info(f'Edge (t1, t2) : {args.lower_threshold}, {args.upper_threshold}')
             # Connected Components Labelling 
             labelNum, label, stat, centroid = cv.connectedComponentsWithStats(edges, 8)
@@ -80,11 +89,14 @@ if __name__ == "__main__" :
                 )
                 # Draw ellipse 
                 if (model != []) :
-                    drawEllipse(out, model)
+                    drawEllipse(out, model, args.crop)
 
                 logging.info(f'Component {i} process complete.')
                 i = i + 1
             ####################################################
+            if args.crop : 
+                out = cv.bitwise_and(out, img, mask=None)
+            out = cv.resize(out, (w, h))
             # Save images 
             if not os.path.isdir(args.out_dir) : 
                 os.mkdir(args.out_dir)

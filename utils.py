@@ -60,7 +60,7 @@ def filterLabelNum(stat, labelNum, minSize) :
 
     return filteredLabelNum
 
-def drawEllipse(img, model) : 
+def drawEllipse(img, model, isCrop) : 
 
     x0 = int(model[0])
     y0 = int(model[1])
@@ -68,16 +68,28 @@ def drawEllipse(img, model) :
     b = int(model[3])
     theta = int(model[4])
 
-    cv.ellipse(
-        img=img, 
-        center=(x0, y0), 
-        axes=(a, b), 
-        angle=theta, 
-        startAngle=0, 
-        endAngle=360, 
-        color=(0, 0, 255), 
-        thickness=2
-    )
+    if isCrop : 
+        cv.ellipse(
+            img=img, 
+            center=(x0, y0), 
+            axes=(a, b), 
+            angle=theta, 
+            startAngle=0, 
+            endAngle=360, 
+            color=(255, 255, 255), 
+            thickness=-1
+        )
+    else : 
+        cv.ellipse(
+            img=img, 
+            center=(x0, y0), 
+            axes=(a, b), 
+            angle=theta, 
+            startAngle=0, 
+            endAngle=360, 
+            color=(0, 0, 255), 
+            thickness=2
+        )
 
 def computeCCL(labelNum, label):
     for i in range(0, len(label)) :

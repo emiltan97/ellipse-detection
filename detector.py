@@ -4,7 +4,7 @@ import argparse
 import logging
 import os
 
-from utils import filterLabelNum, compileDataPoints, drawEllipse, computeCCL, displayImg
+from utils import filterLabelNum, compileDataPoints, drawEllipse, computeCCL, displayImg, makeTransparent
 from ransac import RANSAC
 from ellipse import Ellipse
 from datetime import datetime
@@ -95,7 +95,8 @@ if __name__ == "__main__" :
                 i = i + 1
             ####################################################
             if args.crop : 
-                out = cv.bitwise_and(out, img, mask=None)
+                out = cv.bitwise_and(out, img)
+                out = makeTransparent(out)
             out = cv.resize(out, (w, h))
             # Save images 
             if not os.path.isdir(args.out_dir) : 

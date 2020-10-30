@@ -119,3 +119,15 @@ def displayImg(img, edges, ccl, out) :
     plt.title('Output')
 
     plt.show()
+
+def makeTransparent(img) : 
+
+    img = cv.cvtColor(img, cv.COLOR_BGR2BGRA)
+
+    for i in range(0, img.shape[0]) :
+        for j in range(0, img.shape[1]) :
+            pixel = img[i][j]
+            if not pixel[:3].any() : 
+                pixel[3] = 0
+                
+    return img

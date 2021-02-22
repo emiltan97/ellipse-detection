@@ -1,6 +1,6 @@
 # Ellipse Detection using RANSAC 
 ## Overview 
-A program that detects elliptical shape in an image. The program flows : 
+A program that detects elliptical shape in an image. The system pipeline : 
 - Downscaling an image for shorter processing time
 - Convert the input image into an edge map using Canny edge detection
 - Two pass connected components labelling to remove small blobs and noises
